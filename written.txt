@@ -13,8 +13,9 @@ move. The cost of rebuilding is O(nlogn) while refit costs O(n). But we have onl
 same.
 
 Q5. Why are some circles drawn with their sides cut off?
-The circles are not actually got cut off. It is just because they overlap and our ray tracer has no depth  ordering. This means that 
-when a pixel is inside several circles, intersects keeps the color of whichever circle the BVH traversal visits last. That order depends 
-on how the tree was built and partitioned, not on a consistent front-to-back order. So where two circles overlap, one circle covers part 
-of the other, and the covered circle looks like it has its side cut off. Circles near the window edge are also cut off by the screen 
-boundary.
+The circles are not actually clipped by the renderer. It is because the BVH bounding boxes are out of date. When the circles move after 
+the BVH was built or refit, a circle can end up partly outside its leaf's bounding box and outside its ancestors' boxes. intersects 
+first checks node.bounds.intersects(point) and returns false if the point is outside the box. This means that when a pixel is on the part
+of a circle that has moved outside its old box, that pixel is never tested against the circle, so that side is not drawn. The circle 
+looks like it has its side cut off, and the cut edge is a straight, axis-aligned line because it is the edge of a bounding box. The fix
+is to call reset or fullRefit after the circles move and before rendering, so every box fully contains its circles.

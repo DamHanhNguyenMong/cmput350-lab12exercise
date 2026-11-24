@@ -278,8 +278,9 @@ int main() {
         scene.update(); // move the circles
         bvh.fullRefit(); // fix the bounding boxes (tree structure stays the same)
         // TODO Q4: rebuild the BVH with reset() instead of fullRefit().
+        bvh.reset(); 
         scene.update();
-        bvh.reset(); // rebuild from scratch (was: bvh.fullRefit();)
+        
 
         for (int y = 0; y < gScreenHeight; ++y) {
             for (int x = 0; x < gScreenWidth; ++x) {
