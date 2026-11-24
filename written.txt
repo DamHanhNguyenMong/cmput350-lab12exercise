@@ -1,5 +1,20 @@
 ﻿Q3. What happens to the bounding boxes with update + fullRefit?
+The bounding boxes stay valid since every parent still fully contains its children and every leaf still contains its circles.
+But it gets worse over time as the tree was built for the initial position, so when the circles move, the circles that were 
+grouped together get further way, boxes have to stretch. Sibling boxes overlap more and more, and the boxes get large and messy.
+A pixel then falls inside both siblings more often, so more nodes must be visited per query and the BVH becomes less efficient as 
+the fp drops but the picture is still correct.
 
 Q4. What happens with reset (rebuild every frame) instead?
+The bounding boxes fit the circles tightly every frame. Since the whole tree is rebuilt from the current positions, circles close
+together will be grouped together, hence sibling boxes overlap little. Each pixel query visits few nodes since the boxes never degrade
+as the circles move like in fullRefit. But since the tree structures change every frame, bozes visibly jump and reshuffle as circles 
+move. The cost of rebuilding is O(nlogn) while refit costs O(n). But we have only 100 circles so it is still cheap, fp stays about the 
+same.
 
 Q5. Why are some circles drawn with their sides cut off?
+The circles are not actually got cut off. It is just because they overlap and our ray tracer has no depth  ordering. This means that 
+when a pixel is inside several circles, intersects keeps the color of whichever circle the BVH traversal visits last. That order depends 
+on how the tree was built and partitioned, not on a consistent front-to-back order. So where two circles overlap, one circle covers part 
+of the other, and the covered circle looks like it has its side cut off. Circles near the window edge are also cut off by the screen 
+boundary.
